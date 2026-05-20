@@ -4,7 +4,7 @@
 본 저장소는 **PRIS-RHP** (Patch-Review Interaction Semantics for Review Helpfulness Prediction)의 공식 구현체를 제공함. 
 PRIS-RHP는 Steam 게임 리뷰의 유용성(`votes_up`)을 예측하기 위해 **리뷰 본문**, **공식 패치노트**, **리뷰어/리뷰 메타정보**, **hand-crafted 언어 피처**를 통합적으로 모델링.
 
-PRIS-RHP는 리뷰와 패치노트를 모두 **BGE(BAAI/bge-large-en-v1.5) CLS 임베딩**으로 인코딩한 뒤, 두 임베딩의 **합·곱·차** 표현을 함께 결합하여 패치-리뷰 간 상호작용 의미를 명시적으로 모델링하고, hand-crafted 피처 및 메타 피처와 함께 **Deep Pyramid MLP**에 입력하여 로그 변환된 유용성 점수를 예측. *No Man's Sky* Steam 리뷰 데이터를 활용한 실험을 통해, 패치-리뷰 상호작용과 리뷰어 컨텍스트를 함께 활용하는 방식이 텍스트/메타 단일 기반 베이스라인 대비 일관된 성능 향상을 보임을 확인.
+PRIS-RHP는 리뷰와 패치노트를 모두 **BGE(BAAI/bge-large-en-v1.5) CLS 임베딩**으로 인코딩한 뒤, 두 임베딩의 **원본 표현과 element-wise 곱·차**를 함께 결합해 패치-리뷰 간 상호작용 의미를 명시적으로 포착한다. 이를 hand-crafted 피처 및 메타 피처와 이어붙여 **Deep Pyramid MLP**에 입력함으로써 로그 변환된 유용성 점수를 예측. *No Man's Sky* Steam 리뷰 데이터를 활용한 실험을 통해, 패치-리뷰 상호작용과 리뷰어 컨텍스트를 함께 활용하는 방식이 텍스트/메타 단일 기반 베이스라인 대비 일관된 성능 향상을 보임을 확인.
 
 ## 실행 환경 (Requirements)
 - Python 3.10+
