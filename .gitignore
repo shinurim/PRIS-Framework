@@ -1,0 +1,40 @@
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.Python
+
+# ---------- Virtualenv ----------
+venv/
+env/
+.venv/
+ENV/
+
+# ---------- IDE / OS ----------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ---------- Claude Code ----------
+.claude/
+
+# ---------- Jupyter ----------
+.ipynb_checkpoints/
+
+# ---------- Data (large raw / processed files) ----------
+# 원본 / 전처리 CSV는 data.zip으로 배포
+data/raw/*.csv
+data/raw/patch/
+data/processed/*.csv
+data/processed/*.parquet
+
+# 압축 데이터셋은 포함 (data.zip은 위 패턴에 안 걸림)
+!data.zip
+
+# ---------- Model artifacts ----------
+model/*.pt
+model/*.pth
+model/*.ckpt
+*.log

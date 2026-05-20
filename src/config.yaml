@@ -1,0 +1,38 @@
+seed: 42
+data:
+  fname: nomans_processed
+  text_col: review
+  rating_col: votes_up
+  patch_name_col: txt_file_name
+  patch_flag_col: has_patch_notes
+  meta_num_cols:
+    - author_num_reviews
+    - author_num_games_owned
+    - author_playtime_forever
+    - timestamp_created
+    - author_playtime_at_review
+  meta_bin_cols:
+    - received_for_free
+  min_words: 3
+  clip_quantile: 0.99
+  test_val_size: 0.30
+  val_size: 0.10
+bge:
+  model_ckpt: BAAI/bge-large-en-v1.5
+  batch_size: 128
+  chunk_size: 510
+  max_length: 512
+  emb_dim: 1024
+  output_col_review: review_bge
+  output_col_patch: patch_bge
+args:
+  epochs: 100
+  batch_size: 128
+  learning_rate: 0.0003
+  dropout_rate: 0.2
+  weight_decay: 0.0001
+  patience: 10
+  loss_beta: 0.5
+  emb_dim: 1024
+  hc_dim: 4
+  meta_dim: 6
