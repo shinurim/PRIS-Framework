@@ -77,43 +77,41 @@ python -m textblob.download_corpora
 
 ## 모델 설명 (Model Description)
 
-PRIS-RHP는 리뷰 의미, 그 시점의 패치노트 의미, 리뷰어 행동, 리뷰의 언어적 특성을 함께 활용하는 멀티모달 회귀 모델로, 다음 7단계 파이프라인으로 구성된다.
+PRIS-RHP는 리뷰 의미, 그 시점의 패치노트 의미, 리뷰어 행동, 리뷰의 언어적 특성을 함께 활용하는 멀티모달 회귀 모델로, 다음 7단계 파이프라인으로 구성.
 
-<p align="center">
-  <img src="model/pris_architecture.png" alt="PRIS-RHP 모델 구조" width="700">
-</p>
+<img width="1280" height="720" alt="PRIS_Framework" src="https://github.com/user-attachments/assets/75d00665-242b-4ed9-a833-22cc6f5c5e51" />
 
 ### Step 1. 리뷰 인코딩
-리뷰 본문을 `BAAI/bge-large-en-v1.5`에 입력해 `[CLS]` 토큰의 1024차원 임베딩 $r \in \mathbb{R}^{1024}$ 을 얻는다. 토큰은 최대 512로 truncation한다.
+리뷰 본문을 `BAAI/bge-large-en-v1.5`에 입력해 `[CLS]` 토큰의 1024차원 임베딩 $r \in \mathbb{R}^{1024}$ 을 확보. 토큰은 최대 512로 truncation.
 
 ### Step 2. 패치노트 인코딩
-각 리뷰는 `txt_file_name`을 통해 그 시점의 공식 패치노트 한 개와 매칭된다. 패치노트는 길이가 길어 510 토큰 단위로 청크 분할 → 각 청크의 CLS 임베딩 → mean pooling을 거쳐 단일 1024차원 임베딩 $p \in \mathbb{R}^{1024}$ 로 집계한다.
+각 리뷰는 `txt_file_name`을 통해 그 시점의 공식 패치노트 한 개와 매칭. 패치노트는 길이가 길어 510 토큰 단위로 청크 분할 → 각 청크의 CLS 임베딩 → mean pooling을 거쳐 단일 1024차원 임베딩 $p \in \mathbb{R}^{1024}$ 로 집계.
 
 ### Step 3. Hand-crafted 언어 피처 (4-dim)
-정제된 리뷰 텍스트에서 단어 수(`hc_word_count`), Flesch 가독성(`hc_readability`), TextBlob 주관성(`hc_subjectivity`), VADER 감성(`hc_sentiment`) 4개 값을 추출해 $\text{hc} \in \mathbb{R}^{4}$ 를 구성한다.
+정제된 리뷰 텍스트에서 단어 수(`hc_word_count`), Flesch 가독성(`hc_readability`), TextBlob 주관성(`hc_subjectivity`), VADER 감성(`hc_sentiment`) 4개 값을 추출해 $\text{hc} \in \mathbb{R}^{4}$ 를 구성.
 
 ### Step 4. 리뷰어/리뷰 메타정보 (6-dim)
-유용성에 영향을 주는 리뷰어 행동 및 리뷰 컨텍스트를 6차원 벡터 $\text{meta} \in \mathbb{R}^{6}$ 로 구성한다.
+유용성에 영향을 주는 리뷰어 행동 및 리뷰 컨텍스트를 6차원 벡터 $\text{meta} \in \mathbb{R}^{6}$ 로 구성.
 
 - 수치형 5개 — `author_num_reviews`(Steam 총 리뷰 수), `author_num_games_owned`(보유 게임 수), `author_playtime_forever`(전체 플레이타임), `author_playtime_at_review`(리뷰 작성 시점 플레이타임), `timestamp_created`(리뷰 작성 시각)
 - 이진형 1개 — `received_for_free`(무료 수령 여부)
 
-전처리는 수치형의 경우 NaN 제거 → 음수 클리핑 → `log1p` → `StandardScaler` 순으로 적용하며, 이진형은 NaN→0 변환 후 그대로 사용한다. 모든 스케일러는 train에만 fit해 데이터 누수를 방지한다.
+전처리는 수치형의 경우 NaN 제거 → 음수 클리핑 → `log1p` → `StandardScaler` 순으로 적용하며, 이진형은 NaN→0 변환 후 그대로 사용한다. 모든 스케일러는 train에만 fit해 데이터 누수를 방지.
 
 ### Step 5. 다중 표현 융합
-리뷰-패치 상호작용을 명시적으로 표현하기 위해 두 임베딩의 원본·곱·차를 결합하고, 여기에 HC와 메타를 이어붙여 최종 입력 벡터 $x \in \mathbb{R}^{4106}$ 를 만든다 ($1024 \times 4 + 4 + 6$).
+리뷰-패치 상호작용을 명시적으로 표현하기 위해 두 임베딩의 원본·곱·차를 결합하고, 여기에 HC와 메타를 이어붙여 최종 입력 벡터 $x \in \mathbb{R}^{4106}$ 를 생성 ($1024 \times 4 + 4 + 6$).
 
 $$
 x = \big[\; r \;\|\; p \;\|\; r \odot p \;\|\; r - p \;\|\; \text{hc} \;\|\; \text{meta} \;\big]
 $$
 
-$r \odot p$ 는 리뷰와 패치의 공통 의미를, $r - p$ 는 두 텍스트의 차이 의미를 포착한다.
+$r \odot p$ 는 리뷰와 패치의 공통 의미를, $r - p$ 는 두 텍스트의 차이 의미를 포착.
 
 ### Step 6. Deep Pyramid MLP
-$x$ 는 `4106 → 1024 → 512 → 256` 으로 점진 축소되는 3-layer Pyramid MLP에 입력된다. 각 블록은 `Linear → BatchNorm → GELU → Dropout` 에 residual skip(차원 불일치 시 1×1 Linear projection)을 더한 구조로, 그래디언트 흐름을 안정화한다.
+$x$ 는 `4106 → 1024 → 512 → 256` 으로 점진 축소되는 3-layer Pyramid MLP에 입력. 각 블록은 `Linear → BatchNorm → GELU → Dropout` 에 residual skip(차원 불일치 시 1×1 Linear projection)을 더한 구조로, 그래디언트 흐름을 안정화.
 
 ### Step 7. 예측 헤드 및 학습
-최종 256차원 표현은 `Linear(256 → 1)` 헤드를 거쳐 스칼라 예측값을 산출한다. 학습은 타깃 `y_log = log1p(votes_up)`, 손실 `SmoothL1Loss(β=0.5)`, 옵티마이저 `AdamW(lr=3e-4, wd=1e-4)`, gradient clipping(`max_norm=1.0`), dropout `0.2`로 진행하며, validation loss 기준 patience=10의 Early Stopping을 적용한다.
+최종 256차원 표현은 `Linear(256 → 1)` 헤드를 거쳐 스칼라 예측값을 산출. 학습은 타깃 `y_log = log1p(votes_up)`, 손실 `SmoothL1Loss(β=0.5)`, 옵티마이저 `AdamW(lr=3e-4, wd=1e-4)`, gradient clipping(`max_norm=1.0`), dropout `0.2`로 진행하며, validation loss 기준 patience=10의 Early Stopping을 적용.
 
 ## 실행 방법 (How to Run)
 
