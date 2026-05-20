@@ -142,9 +142,6 @@ Expand-Archive -Path data.zip -DestinationPath .
 
 리뷰 CSV의 `txt_file_name` 컬럼이 `data/raw/official/` 내 파일명과 매칭되어야 하며, `has_patch_notes == True`인 행만 학습에 사용.
 
-### 전처리
-`main.py` 최초 실행 시, `data/processed/` 내에 train/val/test parquet 파일이 존재하는지 확인합니다. **파일이 없을 경우** Step 1~5에 해당하는 파이프라인이 자동으로 수행되어 `nomans_processed_{train,val,test}.parquet` 으로 저장. 이후 실행에서는 캐시된 parquet 파일을 직접 로드.
-
 ### 설정 (Configuration)
 파일명, BGE 설정, 학습 하이퍼파라미터는 [src/config.yaml](src/config.yaml)을 통해 조정.
  
