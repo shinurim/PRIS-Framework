@@ -1,12 +1,20 @@
 # PRIS-RHP: Patch-Review Interaction Semantics for Review Helpfulness Prediction
 
-## 개요 (Overview)
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white">
+  <img src="https://img.shields.io/badge/PyTorch-2.1+-EE4C2C?logo=pytorch&logoColor=white">
+  <img src="https://img.shields.io/badge/Transformers-4.44-FFD21E?logo=huggingface&logoColor=black">
+  <img src="https://img.shields.io/badge/Model-BGE--large--en--v1.5-4B8BBE">
+</p>
+
+
+## 📌 개요 (Overview)
 본 저장소는 **PRIS-RHP** (Patch-Review Interaction Semantics for Review Helpfulness Prediction)의 공식 구현체를 제공함. 
 PRIS-RHP는 Steam 게임 리뷰의 유용성(`votes_up`)을 예측하기 위해 **리뷰 본문**, **공식 패치노트**, **리뷰어/리뷰 메타정보**, **hand-crafted 언어 피처**를 통합적으로 모델링.
 
 PRIS-RHP는 리뷰와 패치노트를 모두 **BGE(BAAI/bge-large-en-v1.5) CLS 임베딩**으로 인코딩한 뒤, 두 임베딩의 **원본 표현과 element-wise 곱·차**를 함께 결합해 패치-리뷰 간 상호작용 의미를 명시적으로 포착한다. 이를 hand-crafted 피처 및 메타 피처와 이어붙여 **Deep Pyramid MLP**에 입력함으로써 로그 변환된 유용성 점수를 예측. *No Man's Sky* Steam 리뷰 데이터를 활용한 실험을 통해, 패치-리뷰 상호작용과 리뷰어 컨텍스트를 함께 활용하는 방식이 텍스트/메타 단일 기반 베이스라인 대비 일관된 성능 향상을 보임을 확인.
 
-## 실행 환경 (Requirements)
+## ⚙️ 실행 환경 (Requirements)
 - Python 3.10+
 - numpy<2.0
 - pandas>=1.5.0,<3.0
@@ -30,7 +38,7 @@ pip install -r requirements.txt
 python -m textblob.download_corpora
 ```
 
-## 저장소 구조 (Repository Structure)
+## 📁 저장소 구조 (Repository Structure)
 
 ```bash
 ├── data/
@@ -58,7 +66,7 @@ python -m textblob.download_corpora
 └── .gitignore
 ```
 
-## 데이터 (Data)
+## 📊 데이터 (Data)
 
 *No Man's Sky*의 Steam 리뷰와 14개 공식 패치노트를 매칭한 데이터셋을 사용. 리뷰는 `txt_file_name` 컬럼으로 그 시점의 패치노트와 연결되며, `has_patch_notes == True`인 행만 학습에 사용. 모델이 실제로 사용하는 주요 컬럼은 다음과 같음.
 
@@ -75,7 +83,7 @@ python -m textblob.download_corpora
 | `timestamp_created` | 메타 (수치형) | 리뷰 작성 시각 (Unix timestamp) |
 | `received_for_free` | 메타 (이진형) | 게임을 무료로 받았는지 여부 (0/1) |
 
-## 모델 설명 (Model Description)
+## 🧠 모델 설명 (Model Description)
 
 PRIS-RHP는 리뷰 의미, 그 시점의 패치노트 의미, 리뷰어 행동, 리뷰의 언어적 특성을 함께 활용하는 멀티모달 회귀 모델로, 다음 7단계 파이프라인으로 구성.
 
@@ -113,7 +121,7 @@ $x$ 는 `4106 → 1024 → 512 → 256` 으로 점진 축소되는 3-layer Pyram
 ### Step 7. 예측 헤드 및 학습
 최종 256차원 표현은 `Linear(256 → 1)` 헤드를 거쳐 스칼라 예측값을 산출. 학습은 타겟 `y_log = log1p(votes_up)`, 손실 `SmoothL1Loss(β=0.5)`, 옵티마이저 `AdamW(lr=3e-4, wd=1e-4)`, gradient clipping(`max_norm=1.0`), dropout `0.2`로 진행하며, validation loss 기준 patience=10의 Early Stopping을 적용.
 
-## 실행 방법 (How to Run)
+## 🚀 실행 방법 (How to Run)
 
 ### 환경 구성
 가상환경 생성 및 의존성 설치:
