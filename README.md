@@ -168,7 +168,7 @@ python main.py
 ```
 테스트셋에서는 **RMSE**, **MSE**, **MAE**, **MAPE** 지표가 출력.
 
-## 실험 결과 (Experimental Results)
+## 📊 실험 결과 (Experimental Results)
 
 PRIS-RHP는 *No Man's Sky*의 Steam 리뷰와 14개 공식 패치노트를 매칭한 데이터셋에서 평가. 텍스트 단일 기반, 메타 단일 기반, 단순 concatenation 융합 기반 베이스라인과 비교 실험을 수행.
 
