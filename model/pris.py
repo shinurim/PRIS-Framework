@@ -1,4 +1,5 @@
 import math
+import os
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
@@ -74,7 +75,7 @@ def model_compile(model, args):
 
 
 def train_model(model, train_r, train_p, train_hc, train_meta, train_y,
-                val_r, val_p, val_hc, val_meta, val_y, args):
+                val_r, val_p, val_hc, val_meta, val_y, args, save_path: str = None):
     batch_size = args.get("batch_size", 128)
     epochs     = args.get("epochs", 100)
     patience   = args.get("patience", 10)
@@ -170,6 +171,14 @@ def train_model(model, train_r, train_p, train_hc, train_meta, train_y,
     if best_state is not None:
         model.load_state_dict(best_state)
     print(f"\n학습 완료: best val_loss={best_val:.4f}")
+
+    # best 가중치를 .pt로 저장 (state_dict만). save_path가 주어졌을 때만.
+    if save_path is not None:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        state_to_save = best_state if best_state is not None else model.state_dict()
+        torch.save(state_to_save, save_path)
+        print(f"[checkpoint] best weights saved → {save_path}")
+
     return history
 
 

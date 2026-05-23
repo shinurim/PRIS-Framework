@@ -1,7 +1,7 @@
 import os
 
 from src.utils import set_seed, load_yaml, load_npy_files, get_metrics
-from src.path import SRC_PATH, PROCESSED_PATH
+from src.path import SRC_PATH, PROCESSED_PATH, MODEL_SAVE_PATH
 from src.data import DataProcessor
 from model.pris import Proposed, train_model, predict
 
@@ -33,12 +33,13 @@ if __name__ == "__main__":
         meta_dim=args_config.get("meta_dim"),
     )
 
-    # 학습
+    # 학습 (best 가중치는 model_save/pris_best.pt 로 저장)
     print(f"Starting model training...")
+    ckpt_path = os.path.join(MODEL_SAVE_PATH, "pris_best.pt")
     train_model(model,
                 train_r, train_p, train_hc, train_meta, train_y,
                 val_r, val_p, val_hc, val_meta, val_y,
-                args_config)
+                args_config, save_path=ckpt_path)
 
     # 평가
     print(f"Starting model Testing...")

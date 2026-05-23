@@ -21,7 +21,7 @@ from src.bge import BGEExtractor
 HC_COLS = ['hc_word_count', 'hc_readability', 'hc_subjectivity', 'hc_sentiment']
 
 class DataProcessor:
-    def __init__(self, fname: str,
+    def __init__(self, fname: str, raw_fname: str=None,
                  text_col: str=None, rating_col: str=None,
                  patch_name_col: str=None, patch_flag_col: str=None,
                  meta_num_cols: list=None, meta_bin_cols: list=None,
@@ -29,6 +29,8 @@ class DataProcessor:
                  test_val_size: float=None, val_size: float=None,
                  bge_config: dict=None):
         self.fname = fname
+        # 원본 CSV basename. 지정 안 하면 fname을 그대로 쓴다.
+        self.raw_fname = raw_fname or fname
 
         #데이터 로드
         self.text_col = text_col
@@ -215,7 +217,7 @@ class DataProcessor:
 
     #Processing RUN
     def run(self):
-        dpath = os.path.join(RAW_PATH, f"{self.fname}.csv")
+        dpath = os.path.join(RAW_PATH, f"{self.raw_fname}.csv")
         df = self.load_data(dpath)
         df, patch_texts = self.load_patches(df)
         df = self.extract_handcrafted(df)

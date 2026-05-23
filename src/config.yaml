@@ -1,6 +1,7 @@
 seed: 42
 data:
-  fname: nomans_processed
+  fname: nomans_processed          # 전처리 결과(parquet) 파일 basename
+  raw_fname: nomans_reviews_flat_en__   # data/raw/ 안의 원본 CSV basename (.csv 제외)
   text_col: review
   rating_col: votes_up
   patch_name_col: txt_file_name
