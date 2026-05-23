@@ -1,27 +1,22 @@
 # =========================================================
 #  PRIS-RHP requirements
 #  기준 환경: RunPod (Python 3.11 / NVIDIA RTX 3090 / CUDA 12.4)
-#  torch / numpy 는 RunPod 실제 설치본(pip freeze)과 동일하게 고정.
-#  나머지는 그 버전들과 호환되는 동일 시기 버전으로 고정.
 # =========================================================
 
 # ---------- PyTorch (CUDA 12.4 빌드) ----------
-# RunPod base image와 동일. 다른 CUDA 서버면 아래 cu124를 맞춰 바꾸세요
-#   30/40번대·A100 → cu121 또는 cu124   |   50번대(5090) → cu128
 --extra-index-url https://download.pytorch.org/whl/cu124
 torch==2.4.1
 torchvision==0.19.1
 torchaudio==2.4.1
 
 # ---------- Core ----------
-setuptools<81          # textstat가 pkg_resources를 import (새 env엔 없을 수 있음)
 numpy==1.26.3
 pandas==2.2.2
 scipy==1.13.1
 scikit-learn==1.5.1
 tqdm==4.66.5
 
-# ---------- Parquet I/O (to_parquet/read_parquet 필수) ----------
+# ---------- Parquet I/O ----------
 pyarrow==17.0.0
 
 # ---------- NLP / Embedding ----------
@@ -30,7 +25,4 @@ textstat==0.7.4
 textblob==0.18.0.post0
 vaderSentiment==3.3.2
 contractions==0.1.73
-# sentence-transformers==2.7.0   # 현재 코드 미사용. 필요해지면 주석 해제
-
-# ---------- Visualization ----------
-matplotlib==3.9.2
+sentence-transformers==2.7.0
